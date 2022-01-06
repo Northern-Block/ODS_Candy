@@ -21,9 +21,9 @@ spec:
         - name: MEDIATOR_AGENT_HTTP_IN_PORT
           value: "3000"
         - name: MEDIATOR_AGENT_LABEL
-          value: "Wallet_Agent"
+          value: "ODS_Mediator"
         - name: MEDIATOR_ENDPOINT_URL
-          value: "http://99.79.9.149:3004"
+          value: "ws.dev.mediator.candy.di.gov.on.ca"
         command:
           - bash
           - -c
@@ -43,7 +43,7 @@ spec:
             --auto-accept-requests
             --auto-ping-connection
             --enable-undelivered-queue);
-        image: 172.30.1.1:5000/mediator/build-mediator:latest
+        image: image-registry.openshift-image-registry.svc:5000/candi-0000-dev/ods-candy@sha256:0a0830c2b0075e805eb73639dc9483ac8b3cde1bd8dd0f8e17e5155aecbac376
         imagePullPolicy: Always
         name: mediatordeployment
         ports:
