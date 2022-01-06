@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mediatordeployment
+  name: mediatordeployment
+  namespace: mediator
+spec:
+  selector:
+    matchLabels:
+      app: mediatordeployment
+  template:
+    metadata:
+      labels:
+        app: mediatordeployment
+    spec:
+      containers:
+      - env:
+        - name: MEDIATOR_AGENT_HTTP_ADMIN_PORT
+          value: "3001"
+        - name: MEDIATOR_AGENT_HTTP_IN_PORT
+          value: "3000"
+        - name: MEDIATOR_AGENT_LABEL
+          value: "Wallet_Agent"
+        - name: MEDIATOR_ENDPOINT_URL
+          value: "http://99.79.9.149:3004"
+        command:
+          - bash
+          - -c
+          - $(echo aca-py start
+            --open-mediation
+            --label ODS_Mediator
+            --endpoint ${MEDIATOR_ENDPOINT_URL}
+            --inbound-transport http 0.0.0.0 ${MEDIATOR_AGENT_HTTP_IN_PORT}
+            --outbound-transport http
+            --no-ledger
+            --admin 0.0.0.0 ${MEDIATOR_AGENT_HTTP_ADMIN_PORT}
+            --admin-insecure-mode
+            --debug-connections
+            --connections-invite
+            --invite-multi-use
+            --auto-accept-invites
+            --auto-accept-requests
+            --auto-ping-connection
+            --enable-undelivered-queue);
+        image: 172.30.1.1:5000/mediator/build-mediator:latest
+        imagePullPolicy: Always
+        name: mediatordeployment
+        ports:
+        - containerPort: 3001
+          protocol: TCP
+        - containerPort: 3000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 60m
+            memory: 512Mi
+          requests:
+            cpu: 30m
+            memory: 128Mi
+      hostname: mediator
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mediatorservice
+  name: mediatorservice
+  namespace: mediator
+spec:
+  ports:
+  - name: httpinbound
+    port: 3000
+    protocol: TCP
+  - name: httpadmin
+    port: 3001
+    protocol: TCP
+  selector:
+    app: mediatorservice
